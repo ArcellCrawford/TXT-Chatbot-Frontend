@@ -1,75 +1,120 @@
+import { Background, Button } from '@react-navigation/elements';
 import { Image } from 'expo-image';
-import { Platform, StyleSheet } from 'react-native';
-
-import { HelloWave } from '@/components/HelloWave';
-import ParallaxScrollView from '@/components/ParallaxScrollView';
-import { ThemedText } from '@/components/ThemedText';
-import { ThemedView } from '@/components/ThemedView';
+import { StyleSheet,KeyboardAvoidingView,FlatList } from 'react-native';
+import { TextInput,Text } from 'react-native-paper';
+import { View,Platform,TouchableOpacity } from 'react-native';
+import { useState } from 'react';
 
 export default function HomeScreen() {
+  const [messages, setMessages]= useState([{ type: '', text: '' }]);
+  // const [re_Messages, setRe_Messages]= useState(['']);
+  const [input, setInput] = useState('');
+
+//function to send messages to the chat log 
+  const handleSendMessage = () => {
+   
+    if (input.trim()) {
+      const userMessage = { type: 'user', text: input };
+      const responseMessage = { type: 'response', text: 'This is an automated response.' };
+
+      setMessages([...messages,userMessage, responseMessage]); 
+      // setRe_Messages([...re_Messages, responseMessage.text]);
+
+       // Clear the input field after sending the message
+      setInput(''); // Clear the input field
+       console.log('I was pressed and got the message:', messages);
+    }
+  };
+
   return (
-    <ParallaxScrollView
-      headerBackgroundColor={{ light: '#A1CEDC', dark: '#1D3D47' }}
-      headerImage={
-        <Image
-          source={require('@/assets/images/partial-react-logo.png')}
-          style={styles.reactLogo}
-        />
-      }>
-      <ThemedView style={styles.titleContainer}>
-        <ThemedText type="title">Welcome!</ThemedText>
-        <HelloWave />
-      </ThemedView>
-      <ThemedView style={styles.stepContainer}>
-        <ThemedText type="subtitle">Step 1: Try it</ThemedText>
-        <ThemedText>
-          Edit <ThemedText type="defaultSemiBold">app/(tabs)/index.tsx</ThemedText> to see changes.
-          Press{' '}
-          <ThemedText type="defaultSemiBold">
-            {Platform.select({
-              ios: 'cmd + d',
-              android: 'cmd + m',
-              web: 'F12',
-            })}
-          </ThemedText>{' '}
-          to open developer tools.
-        </ThemedText>
-      </ThemedView>
-      <ThemedView style={styles.stepContainer}>
-        <ThemedText type="subtitle">Step 2: Explore</ThemedText>
-        <ThemedText>
-          {`Tap the Explore tab to learn more about what's included in this starter app.`}
-        </ThemedText>
-      </ThemedView>
-      <ThemedView style={styles.stepContainer}>
-        <ThemedText type="subtitle">Step 3: Get a fresh start</ThemedText>
-        <ThemedText>
-          {`When you're ready, run `}
-          <ThemedText type="defaultSemiBold">npm run reset-project</ThemedText> to get a fresh{' '}
-          <ThemedText type="defaultSemiBold">app</ThemedText> directory. This will move the current{' '}
-          <ThemedText type="defaultSemiBold">app</ThemedText> to{' '}
-          <ThemedText type="defaultSemiBold">app-example</ThemedText>.
-        </ThemedText>
-      </ThemedView>
-    </ParallaxScrollView>
+    
+  <View style={styles.View}>
+    <KeyboardAvoidingView
+      style={styles.View2} 
+      behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
+    >
+    
+         <Image
+          source={require('../../assets/images/TXT_Logo.png')}
+          style={{ alignSelf: 'center', marginVertical: 10, width: '100%', height: 100 }}
+          contentFit='contain'
+         />
+         <FlatList
+      data={messages}
+      keyExtractor={(item, index) => index.toString()}
+      renderItem={({ item }) => (
+       <View>
+         <Text style={ 
+          item.type === 'user' && item.text.trim()
+          ? styles.messageContainer_User
+          : item.type === 'response' && item.text.trim()
+          ? styles.messageContainer_Resp
+          : styles.emptyMessageText
+         }>
+          {item.text}
+         </Text>
+       </View>
+      )}
+         />
+         <TextInput
+          style={styles.TextInput}
+          placeholder="Ask your question..."
+          value={input}
+          onChangeText={setInput}
+         />
+     <TouchableOpacity style={styles.sendButton} onPress={handleSendMessage}>
+      <Text>Send</Text> 
+     </TouchableOpacity>
+    </KeyboardAvoidingView>
+  </View>
   );
 }
 
 const styles = StyleSheet.create({
-  titleContainer: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 8,
+  View:{
+    display:'flex',
+    flexDirection:'column',
+    backgroundColor: '#ffffff',
+    flex:1
   },
-  stepContainer: {
-    gap: 8,
-    marginBottom: 8,
+  View2:{
+    
+    flex:1
   },
-  reactLogo: {
-    height: 178,
-    width: 290,
-    bottom: 0,
-    left: 0,
-    position: 'absolute',
+  Container:{
+    flex:1
   },
+  TextInput: {
+    position:'absolute',
+    top:'84%',
+    flex:2,
+    width: '100%',
+  },
+  sendButton:{
+    position:'absolute',
+    top:'86%',
+    flex:2,
+    right :'10%'
+  },
+  messageContainer_User:{
+    backgroundColor: '#fd9388',
+    padding: 10,
+    borderRadius: 20,
+    marginVertical: 5,
+    alignSelf: 'flex-end',
+    width:'auto'
+    
+  },
+  emptyMessageText:{
+
+  },
+  messageContainer_Resp:{
+    backgroundColor: '#2694a9',
+    padding: 10,
+    borderRadius: 20,
+    marginVertical: 5,
+    alignSelf: 'flex-start',
+    width:'auto'
+    
+  }
 });
